@@ -3,6 +3,9 @@ skip_qc: "bamqc,baserecalibrator,bcftools,documentation,markduplicates,multiqc,s
 no_intervals: true
 skip_markduplicates: true
 known_indels: null
-fasta: /home/ssm-user/sarek/work/stage/e9/74e44ffc300ee9371b47eb62399ce7/human_g1k_v37_decoy.small.fasta
-fasta_fai: /home/ssm-user/sarek/work/12/ebe56df669dc436ff0c96b64e35a06/human_g1k_v37_decoy.small.fasta.fai
-bwa: /home/ssm-user/sarek/work/34/23a61e196f46d9c9b20a69184beae2/human_g1k_v37_decoy.small.fasta.{amb,ann,bwt,pac,sa}
+fasta: /home/ssm-user/ref/fai/human_g1k_v37_decoy.small.fasta
+fasta_fai: /home/ssm-user/ref/fai/human_g1k_v37_decoy.small.fasta.fai
+bwa: /home/ssm-user/ref/bwa/human_g1k_v37_decoy.small.fasta.{amb,ann,bwt,pac,sa}
+dict: /home/ssm-user/ref/dict/human_g1k_v37_decoy.small.dict
+dbsnp: /home/ssm-user/ref/dbsnp/dbsnp_138.b37.small.vcf.gz
+dbsnp_index: /home/ssm-user/ref/dbsnp/dbsnp_138.b37.small.vcf.gz.tbi
