@@ -1051,8 +1051,8 @@ process MapReads {
     CN = params.sequencing_center ? "CN:${params.sequencing_center}\\t" : ""
     readGroup = "@RG\\tID:${idRun}\\t${CN}PU:${idRun}\\tSM:${idSample}\\tLB:${idSample}\\tPL:illumina"
     // adjust mismatch penalty for tumor samples
-    status = statusMap[idPatient, idSample]
-    extra = status == 1 ? "-B 3" : ""
+    // status = statusMap[idPatient, idSample]
+    extra = 0 == 1 ? "-B 3" : ""
     convertToFastq = hasExtension(inputFile1, "bam") ? "gatk --java-options -Xmx${task.memory.toGiga()}g SamToFastq --INPUT=${inputFile1} --FASTQ=/dev/stdout --INTERLEAVE=true --NON_PF=true | \\" : ""
     input = hasExtension(inputFile1, "bam") ? "-p /dev/stdin - 2> >(tee ${inputFile1}.bwa.stderr.log >&2)" : "${inputFile1} ${inputFile2}"
     aligner = params.aligner == "bwa-mem2" ? "bwa-mem2" : "bwa"
