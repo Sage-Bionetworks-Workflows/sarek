@@ -1,0 +1,11 @@
+input: https://gist.githubusercontent.com/BrunoGrandePhD/6869bf506e6acf7b920a22b666f4e443/raw/ff7ea0757ebbd324cd125b1d48f54e6ec9f969c9/sarek-test.tsv
+skip_qc: "bamqc,baserecalibrator,bcftools,documentation,markduplicates,multiqc,samtools,sentieon,vcftools,versions"
+no_intervals: true
+skip_markduplicates: true
+known_indels: null
+fasta: /home/ssm-user/ref/fai/human_g1k_v37_decoy.small.fasta
+fasta_fai: /home/ssm-user/ref/fai/human_g1k_v37_decoy.small.fasta.fai
+bwa: /home/ssm-user/ref/bwa/human_g1k_v37_decoy.small.fasta.{amb,ann,bwt,pac,sa}
+dict: /home/ssm-user/ref/dict/human_g1k_v37_decoy.small.dict
+dbsnp: /home/ssm-user/ref/dbsnp/dbsnp_138.b37.small.vcf.gz
+dbsnp_index: /home/ssm-user/ref/dbsnp/dbsnp_138.b37.small.vcf.gz.tbi
