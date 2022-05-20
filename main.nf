@@ -49,7 +49,7 @@ process MapReads {
         set idPatient, val("${idSample}_${idRun}"), file("${idSample}_${idRun}.bam") into bamMappedBamQC
 
     script:
-    status = statusMap[idPatient, idSample]
+    // status = statusMap[idPatient, idSample]
     """
     bwa mem -K 100000000 -t ${task.cpus} -M ${fasta} ${inputFile1} ${inputFile2} | \
     samtools sort --threads ${task.cpus} -m 2G - > ${idSample}_${idRun}.bam
