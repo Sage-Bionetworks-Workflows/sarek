@@ -49,7 +49,7 @@ process MapReads {
         set idPatient, val("${idSample}_${idRun}"), file("${idSample}_${idRun}.bam") into bamMappedBamQC
 
     script:
-    // status = statusMap[idPatient, idSample]
+    status = statusMap[idPatient, idSample]
     """
     bwa mem -K 100000000 -t ${task.cpus} -M ${fasta} ${inputFile1} ${inputFile2} | \
     samtools sort --threads ${task.cpus} -m 2G - > ${idSample}_${idRun}.bam
@@ -68,6 +68,10 @@ def extractInfos(channel) {
         statusMap[idPatient, idSample] = status
         [idPatient] + it[3..-1]
     }
+    // The next line forces roundtrip as a list to ensure
+    // that genderMap and statusMap are fully populated
+    // before being returning and used in processes
+    channel = Channel.fromList(channel.toList().val)
     [genderMap, statusMap, channel]
 }
 
