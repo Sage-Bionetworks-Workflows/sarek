@@ -31,6 +31,7 @@ and processes data using the following steps:
     - [GATK Mutect2](#gatk-mutect2)
     - [samtools mpileup](#samtools-mpileup)
     - [Strelka2](#strelka2)
+    - [Google DeepVariant](#google-deepvariant)
     - [Sentieon DNAseq](#sentieon-dnaseq)
     - [Sentieon DNAscope](#sentieon-dnascope)
     - [Sentieon TNscope](#sentieon-tnscope)
@@ -290,6 +291,19 @@ Using [Strelka Best Practices](https://github.com/Illumina/strelka/blob/master/d
   - `VCF` with Tabix index
 
 For further reading and documentation see the [Strelka2 user guide](https://github.com/Illumina/strelka/blob/master/docs/userGuide/README.md).
+
+#### Google DeepVariant
+
+[Google DeepVariant](https://github.com/google/deepvariant) is a deep learning-based variant caller that takes aligned reads (in BAM or CRAM format), produces pileup image tensors from them, classifies each tensor using a convolutional neural network, and finally reports the results in a standard VCF or gVCF file.
+
+For all samples:
+
+**Output directory: `results/VariantCalling/[SAMPLE]/DeepVariant`**
+
+- `[SAMPLE].vcf.gz` 
+  - `VCF` file
+
+For further reading and documentation, see the [DeepVariant README](https://github.com/google/deepvariant#readme).
 
 #### Sentieon DNAseq
 

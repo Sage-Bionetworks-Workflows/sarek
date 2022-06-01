@@ -49,6 +49,9 @@
 * [Strelka2](https://pubmed.ncbi.nlm.nih.gov/30013048/)
   > Kim S, Scheffler K, Halpern AL, et al.: Strelka2: fast and accurate calling of germline and somatic variants. Nat Methods. 2018 Aug;15(8):591-594. doi: 10.1038/s41592-018-0051-x. Epub 2018 Jul 16. PubMed PMID: 30013048.
 
+* [Google DeepVariant](https://pubmed.ncbi.nlm.nih.gov/30247488/)
+  > Poplin R, Chang PC, Alexander D, Schwartz S, Colthurst T, Ku A, Newburger D, Dijamco J, Nguyen N, Afshar PT, Gross SS, Dorfman L, McLean CY, DePristo MA. A universal SNP and small-indel variant caller using deep neural networks. Nat Biotechnol. 2018 Nov;36(10):983-987. doi: 10.1038/nbt.4235. Epub 2018 Sep 24. PMID: 30247488.
+
 * [TIDDIT](https://pubmed.ncbi.nlm.nih.gov/28781756/)
   > Eisfeldt J, Vezzi F, Olason P, et al.: TIDDIT, an efficient and comprehensive structural variant caller for massive parallel sequencing data. F1000Res. 2017 May 10;6:664. doi: 10.12688/f1000research.11168.2. eCollection 2017. PubMed PMID: 28781756; PubMed Central PMCID: PMC5521161.
 
