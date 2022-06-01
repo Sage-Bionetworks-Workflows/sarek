@@ -91,6 +91,8 @@
                         "mutect2",
                         "strelka",
                         "tiddit",
+                        "deepvariant",
+                        "DeepVariant",
                         "snpeff",
                         "vep",
                         "dnaseq",
@@ -354,7 +356,20 @@
                     "fa_icon": "fas fa-clipboard-list",
                     "description": "When processing UMIs, a read structure should always be provided for each of the fastq files.",
                     "help_text": "If the read does not contain any UMI, the structure will be +T (i.e. only template of any length).\nThe read structure follows a format adopted by different tools and described in the [fgbio documentation](https://github.com/fulcrumgenomics/fgbio/wiki/Read-Structures)"
-                }
+                },
+                "model_type": {
+                    "type": "string",
+                    "default": "WGS",
+                    "fa_icon": "fas fa-file-binary",
+                    "enum": [
+                        "WGS",
+                        "WES",
+                        "PACBIO",
+                        "HYBRID_PACBIO_ILLUMINA"
+                    ],
+                    "description": "Specify the relevant sequencing data type [WGS|WES|PACBIO|HYBRID_PACBIO_ILLUMINA].",
+                    "help_text": "Type of model to use for variant calling. Set this flag to use the default model associated with each type, and it will set necessary flags corresponding to each model."
+                },
             }
         },
         "annotation": {

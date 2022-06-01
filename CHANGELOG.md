@@ -11,15 +11,11 @@ This release doesn't change how the containers are used, so it will continue usi
 
 ### Added
 
-### Changed
+- [#1](https://github.com/Sage-Bionetworks-Workflows/sarek/pull/1) - Add Google DeepVariant as a germline variant caller
 
 ### Fixed
 
 - [#2](https://github.com/Sage-Bionetworks-Workflows/sarek/pull/2) - Fix caching bug affecting a variable number of `MapReads` jobs due to non-deterministic state of `statusMap` during caching evaluation
-
-### Deprecated
-
-### Removed
 
 ## [2.7.1](https://github.com/nf-core/sarek/releases/tag/2.7.1) - Pårtejekna
 

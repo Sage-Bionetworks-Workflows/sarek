@@ -109,6 +109,7 @@ Helpful contributors:
 * [gulfshores](https://github.com/gulfshores)
 * [pallolason](https://github.com/pallolason)
 * [silviamorins](https://github.com/silviamorins)
+* [BrunoGrandePhD](https://github.com/brunograndephd)
 
 ## Contributions & Support
 
