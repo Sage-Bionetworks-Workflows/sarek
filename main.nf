@@ -2186,7 +2186,8 @@ vcfFreebayesSingle = vcfFreebayesSingle.groupTuple(by: [0,1,2])
 
 process DeepVariant {
     tag "${idSample}"
-    label 'process_medium'
+    label 'process_high'
+    label 'process_long'
     label 'deepvariant'
 
     publishDir "${params.outdir}/VariantCalling/${idSample}/DeepVariant", mode: params.publish_dir_mode
