@@ -246,16 +246,16 @@ workflow BAM_VARIANT_CALLING_SOMATIC_MUTECT2 {
     //
     //Contamination and segmentation tables created using calculatecontamination on the pileup summary table.
     //
-    CALCULATECONTAMINATION ( gather_table_tumor.join(gather_table_normal) )
+    CALCULATECONTAMINATION ( gather_table_tumor.join(gather_table_normal, failOnDuplicate: true, failOnMismatch: true) )
 
     //
     //Mutect2 calls filtered by filtermutectcalls using the artifactpriors, contamination and segmentation tables.
     //
-    ch_filtermutect    = mutect2_vcf.join(mutect2_tbi)
-                                    .join(mutect2_stats)
-                                    .join(LEARNREADORIENTATIONMODEL.out.artifactprior)
-                                    .join(CALCULATECONTAMINATION.out.segmentation)
-                                    .join(CALCULATECONTAMINATION.out.contamination)
+    ch_filtermutect    = mutect2_vcf.join(mutect2_tbi, failOnDuplicate: true, failOnMismatch: true)
+                                    .join(mutect2_stats, failOnDuplicate: true, failOnMismatch: true)
+                                    .join(LEARNREADORIENTATIONMODEL.out.artifactprior, failOnDuplicate: true, failOnMismatch: true)
+                                    .join(CALCULATECONTAMINATION.out.segmentation, failOnDuplicate: true, failOnMismatch: true)
+                                    .join(CALCULATECONTAMINATION.out.contamination, failOnDuplicate: true, failOnMismatch: true)
     ch_filtermutect_in = ch_filtermutect.map{ meta, vcf, tbi, stats, orientation, seg, cont -> [meta, vcf, tbi, stats, orientation, seg, cont, []] }
 
     FILTERMUTECTCALLS ( ch_filtermutect_in, fasta, fai, dict )
