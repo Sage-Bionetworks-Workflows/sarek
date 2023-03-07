@@ -63,7 +63,7 @@ workflow BAM_VARIANT_CALLING_SOMATIC_MUTECT2 {
     //Only when using intervals
     MERGE_MUTECT2(
         mutect2_vcf_branch.intervals
-        .map{ meta, vcf ->
+        .map { meta, vcf ->
 
             new_meta = [
                         id:meta.tumor_id + "_vs_" + meta.normal_id,
@@ -90,7 +90,7 @@ workflow BAM_VARIANT_CALLING_SOMATIC_MUTECT2 {
     //Merge Mutect2 Stats
     MERGEMUTECTSTATS(
         mutect2_stats_branch.intervals
-        .map{ meta, stats ->
+        .map { meta, stats ->
 
             new_meta = [
                         id:             meta.tumor_id + "_vs_" + meta.normal_id,
@@ -113,7 +113,7 @@ workflow BAM_VARIANT_CALLING_SOMATIC_MUTECT2 {
     //
     LEARNREADORIENTATIONMODEL(Channel.empty().mix(
         mutect2_f1r2_branch.intervals
-            .map{ meta, f1r2 ->
+            .map { meta, f1r2 ->
 
                 new_meta = [
                             id:             meta.tumor_id + "_vs_" + meta.normal_id,
@@ -139,7 +139,7 @@ workflow BAM_VARIANT_CALLING_SOMATIC_MUTECT2 {
 
     germline_resource_pileup = germline_resource_tbi ? germline_resource : Channel.empty()
     germline_resource_pileup_tbi = germline_resource_tbi ?: Channel.empty()
-    GETPILEUPSUMMARIES_TUMOR ( pileup.tumor.map{
+    GETPILEUPSUMMARIES_TUMOR ( pileup.tumor.map {
                                     meta, cram, crai, intervals ->
 
                                     [[
@@ -154,7 +154,7 @@ workflow BAM_VARIANT_CALLING_SOMATIC_MUTECT2 {
                                 },
                                 fasta, fai, dict, germline_resource_pileup, germline_resource_pileup_tbi )
 
-    GETPILEUPSUMMARIES_NORMAL ( pileup.normal.map{
+    GETPILEUPSUMMARIES_NORMAL ( pileup.normal.map {
                                     meta, cram, crai, intervals ->
 
                                     [[
@@ -182,7 +182,7 @@ workflow BAM_VARIANT_CALLING_SOMATIC_MUTECT2 {
     //Merge Pileup Summaries
     GATHERPILEUPSUMMARIES_NORMAL(
         GETPILEUPSUMMARIES_NORMAL.out.table
-        .map{ meta, table ->
+        .map { meta, table ->
 
             new_meta = [
                             id:             meta.normal_id,
@@ -199,7 +199,7 @@ workflow BAM_VARIANT_CALLING_SOMATIC_MUTECT2 {
 
     gather_table_normal = Channel.empty().mix(
         GATHERPILEUPSUMMARIES_NORMAL.out.table,
-        pileup_table_normal.no_intervals).map{ meta, table ->
+        pileup_table_normal.no_intervals).map { meta, table ->
 
             new_meta = [
                             id:             meta.tumor_id + "_vs_" + meta.normal_id,
@@ -214,7 +214,7 @@ workflow BAM_VARIANT_CALLING_SOMATIC_MUTECT2 {
 
     GATHERPILEUPSUMMARIES_TUMOR(
         GETPILEUPSUMMARIES_TUMOR.out.table
-        .map{ meta, table ->
+        .map { meta, table ->
             new_meta = [
                             id:             meta.tumor_id,
                             normal_id:      meta.normal_id,
@@ -230,7 +230,7 @@ workflow BAM_VARIANT_CALLING_SOMATIC_MUTECT2 {
 
     gather_table_tumor = Channel.empty().mix(
         GATHERPILEUPSUMMARIES_TUMOR.out.table,
-        pileup_table_tumor.no_intervals).map{ meta, table ->
+        pileup_table_tumor.no_intervals).map { meta, table ->
             new_meta = [
                         id:             meta.tumor_id + "_vs_" + meta.normal_id,
                         normal_id:      meta.normal_id,
@@ -246,17 +246,22 @@ workflow BAM_VARIANT_CALLING_SOMATIC_MUTECT2 {
     //
     //Contamination and segmentation tables created using calculatecontamination on the pileup summary table.
     //
-    CALCULATECONTAMINATION ( gather_table_tumor.view{ "Debug view - gather_table_tumor: $it" }.join(gather_table_normal.view{ "Debug view - gather_table_normal: $it" }, failOnDuplicate: true, failOnMismatch: true) )
+    CALCULATECONTAMINATION ( gather_table_tumor.map { [it[0].id, it[0]] + it[1..-1] }
+                                               .join(gather_table_normal.map { [it[0].id] + it[1..-1] }, failOnDuplicate: true, failOnMismatch: true)
+                                               .map { it[1..-1] }
+    )
 
     //
     //Mutect2 calls filtered by filtermutectcalls using the artifactpriors, contamination and segmentation tables.
     //
-    ch_filtermutect    = mutect2_vcf.view{ "Debug view - mutect2_vcf: $it" }.join(mutect2_tbi.view{ "Debug view - mutect2_tbi: $it" }, failOnDuplicate: true, failOnMismatch: true)
-                                    .join(mutect2_stats.view{ "Debug view - mutect2_stats: $it" }, failOnDuplicate: true, failOnMismatch: true)
-                                    .join(LEARNREADORIENTATIONMODEL.out.artifactprior.view{ "Debug view - artifactprior: $it" }, failOnDuplicate: true, failOnMismatch: true)
-                                    .join(CALCULATECONTAMINATION.out.segmentation.view{ "Debug view - segmentation: $it" }, failOnDuplicate: true, failOnMismatch: true)
-                                    .join(CALCULATECONTAMINATION.out.contamination.view{ "Debug view - contamination: $it" }, failOnDuplicate: true, failOnMismatch: true)
-    ch_filtermutect_in = ch_filtermutect.map{ meta, vcf, tbi, stats, orientation, seg, cont -> [meta, vcf, tbi, stats, orientation, seg, cont, []] }
+    ch_filtermutect    = mutect2_vcf.map { [it[0].id, it[0]] + it[1..-1] }
+                                    .join(mutect2_tbi.map { [it[0].id] + it[1..-1] }, failOnDuplicate: true, failOnMismatch: true)
+                                    .join(mutect2_stats.map { [it[0].id] + it[1..-1] }, failOnDuplicate: true, failOnMismatch: true)
+                                    .join(LEARNREADORIENTATIONMODEL.out.artifactprior.map { [it[0].id] + it[1..-1] }, failOnDuplicate: true, failOnMismatch: true)
+                                    .join(CALCULATECONTAMINATION.out.segmentation.map { [it[0].id] + it[1..-1] }, failOnDuplicate: true, failOnMismatch: true)
+                                    .join(CALCULATECONTAMINATION.out.contamination.map { [it[0].id] + it[1..-1] }, failOnDuplicate: true, failOnMismatch: true)
+                                    .map { it[1..-1] }
+    ch_filtermutect_in = ch_filtermutect.map { meta, vcf, tbi, stats, orientation, seg, cont -> [meta, vcf, tbi, stats, orientation, seg, cont, []] }
 
     FILTERMUTECTCALLS ( ch_filtermutect_in, fasta, fai, dict )
 
@@ -283,7 +288,7 @@ workflow BAM_VARIANT_CALLING_SOMATIC_MUTECT2 {
     contamination_table    = CALCULATECONTAMINATION.out.contamination       // channel: [ val(meta), [ contamination ] ]
     segmentation_table     = CALCULATECONTAMINATION.out.segmentation        // channel: [ val(meta), [ segmentation ] ]
 
-    filtered_vcf           = FILTERMUTECTCALLS.out.vcf.map{ meta, vcf -> [[patient:meta.patient, normal_id:meta.normal_id, tumor_id:meta.tumor_id, sex:meta.sex, id:meta.tumor_id + "_vs_" + meta.normal_id, num_intervals:meta.num_intervals, variantcaller:"mutect2"],
+    filtered_vcf           = FILTERMUTECTCALLS.out.vcf.map { meta, vcf -> [[patient:meta.patient, normal_id:meta.normal_id, tumor_id:meta.tumor_id, sex:meta.sex, id:meta.tumor_id + "_vs_" + meta.normal_id, num_intervals:meta.num_intervals, variantcaller:"mutect2"],
                                                                             vcf]} // channel: [ val(meta), [ vcf ] ]
     filtered_tbi           = FILTERMUTECTCALLS.out.tbi                      // channel: [ val(meta), [ tbi ] ]
     filtered_stats         = FILTERMUTECTCALLS.out.stats                    // channel: [ val(meta), [ stats ] ]
