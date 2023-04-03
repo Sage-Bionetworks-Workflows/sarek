@@ -246,21 +246,26 @@ workflow BAM_VARIANT_CALLING_SOMATIC_MUTECT2 {
     //
     //Contamination and segmentation tables created using calculatecontamination on the pileup summary table.
     //
-    CALCULATECONTAMINATION ( gather_table_tumor.map { [it[0].id, it[0]] + it[1..-1] }
-                                               .join(gather_table_normal.map { [it[0].id] + it[1..-1] }, failOnDuplicate: true, failOnMismatch: true)
-                                               .map { it[1..-1] }
+    CALCULATECONTAMINATION ( gather_table_tumor.view { "gather_table_tumor: $it" }
+                                               .join(gather_table_normal.view { "gather_table_normal: $it" },
+                                                     failOnDuplicate: false, failOnMismatch: false)
+
     )
 
     //
     //Mutect2 calls filtered by filtermutectcalls using the artifactpriors, contamination and segmentation tables.
     //
-    ch_filtermutect    = mutect2_vcf.map { [it[0].id, it[0]] + it[1..-1] }
-                                    .join(mutect2_tbi.map { [it[0].id] + it[1..-1] }, failOnDuplicate: true, failOnMismatch: true)
-                                    .join(mutect2_stats.map { [it[0].id] + it[1..-1] }, failOnDuplicate: true, failOnMismatch: true)
-                                    .join(LEARNREADORIENTATIONMODEL.out.artifactprior.map { [it[0].id] + it[1..-1] }, failOnDuplicate: true, failOnMismatch: true)
-                                    .join(CALCULATECONTAMINATION.out.segmentation.map { [it[0].id] + it[1..-1] }, failOnDuplicate: true, failOnMismatch: true)
-                                    .join(CALCULATECONTAMINATION.out.contamination.map { [it[0].id] + it[1..-1] }, failOnDuplicate: true, failOnMismatch: true)
-                                    .map { it[1..-1] }
+    ch_filtermutect    = mutect2_vcf.view { "mutect2_vcf: $it" }
+                                    .join(mutect2_tbi.view { "mutect2_tbi: $it" },
+                                          failOnDuplicate: false, failOnMismatch: false)
+                                    .join(mutect2_stats.view { "mutect2_stats: $it" },
+                                          failOnDuplicate: false, failOnMismatch: false)
+                                    .join(LEARNREADORIENTATIONMODEL.out.artifactprior.view { "artifactprior: $it" },
+                                          failOnDuplicate: false, failOnMismatch: false)
+                                    .join(CALCULATECONTAMINATION.out.segmentation.view { "segmentation: $it" },
+                                          failOnDuplicate: false, failOnMismatch: false)
+                                    .join(CALCULATECONTAMINATION.out.contamination.view { "contamination: $it" },
+                                          failOnDuplicate: false, failOnMismatch: false)
     ch_filtermutect_in = ch_filtermutect.map { meta, vcf, tbi, stats, orientation, seg, cont -> [meta, vcf, tbi, stats, orientation, seg, cont, []] }
 
     FILTERMUTECTCALLS ( ch_filtermutect_in, fasta, fai, dict )
