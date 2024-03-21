@@ -159,11 +159,11 @@ ecoli,/path/to/ecoli.fa
 sarscov2,/path/to/sarscov2.fa
 ```
 
-By default, only mapping statistics describing the number of reads assigned to each reference will be saved in the output-folder (i.e. results/reports/bbsplit). The reads mapping to the references and genome index files are intermediate and by default not delivered to users. You can set `--save_bbsplit_reads` and/or `--save_reference` to enable saving of these files. 
+By default, only mapping statistics describing the number of reads assigned to each reference will be saved in the output-folder (i.e. results/reports/bbsplit). The reads mapping to the references and genome index files are intermediate and by default not delivered to users. You can set `--save_bbsplit_reads` and/or `--save_reference` to enable saving of these files.
 
 If `--save_bbsplit_reads` is specified, FastQ files split by reference will be saved to the results/preprocessing/bbsplit directory. Reads from the main reference genome will be named "_primary_.fastq.gz". Reads from contaminating genomes will be named "_<SHORT_NAME>_.fastq.gz" where `<SHORT_NAME>` is the first column in `--bbsplit_fasta_list` that needs to be provided to initially build the index.
 
-If `--save_reference` is specified, the genome index files will be saved in the results/reference/genome/bbsplit/ directory and you can then provide it via `--bbsplit_index` for future runs. 
+If `--save_reference` is specified, the genome index files will be saved in the results/reference/genome/bbsplit/ directory and you can then provide it via `--bbsplit_index` for future runs.
 
 <details markdown="1">
 <summary>Output files for all samples</summary>
