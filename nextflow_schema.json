@@ -10,7 +10,10 @@
             "type": "object",
             "fa_icon": "fas fa-terminal",
             "description": "Define where the pipeline should find input data and save output data.",
-            "required": ["step", "outdir"],
+            "required": [
+                "step",
+                "outdir"
+            ],
             "properties": {
                 "step": {
                     "type": "string",
@@ -76,7 +79,7 @@
                     "fa_icon": "fas fa-clock",
                     "description": "Estimate interval size.",
                     "help_text": "Intervals are parts of the chopped up genome used to speed up preprocessing and variant calling. See `--intervals` for more info. \n\nChanging this parameter, changes the number of intervals that are grouped and processed together. Bed files from target sequencing can contain thousands or small intervals. Spinning up a new process for each can be quite resource intensive. Instead it can be desired to process small intervals together on larger nodes. \nIn order to make use of this parameter, no runtime estimate can be present in the bed file (column 5). ",
-                    "default": 200000
+                    "default": 200000.0
                 },
                 "no_intervals": {
                     "type": "boolean",
@@ -97,6 +100,12 @@
                     "description": "Disable specified tools.",
                     "help_text": "Multiple tools can be specified, separated by commas.\n\n> **NB** `--skip_tools baserecalibrator_report` is actually just not saving the reports.\n> **NB** `--skip_tools markduplicates_report` does not skip `MarkDuplicates` but prevent the collection of duplicate metrics that slows down performance.",
                     "pattern": "^((baserecalibrator|baserecalibrator_report|bcftools|documentation|fastqc|haplotypecaller_filter|markduplicates|markduplicates_report|mosdepth|multiqc|samtools|vcftools|versions)?,?)*(?<!,)$"
+                },
+                "skip_bbsplit": {
+                    "type": "boolean",
+                    "default": true,
+                    "fa_icon": "fas fa-fast-forward",
+                    "description": "Skip BBSplit for removal of non-reference genome reads."
                 }
             },
             "fa_icon": "fas fa-user-cog"
@@ -180,6 +189,28 @@
                     "fa_icon": "fas fa-vial",
                     "description": "If set, publishes split FASTQ files. Intended for testing purposes.",
                     "hidden": true
+                },
+                "bbsplit_fasta_list": {
+                    "type": "string",
+                    "format": "file-path",
+                    "exists": true,
+                    "mimetype": "text/plain",
+                    "fa_icon": "fas fa-list-alt",
+                    "description": "Path to comma-separated file containing a list of reference genomes to filter reads against with BBSplit. You have to also explicitly set `--skip_bbsplit false` if you want to use BBSplit.",
+                    "help_text": "The file should contain 2 columns: short name and full path to reference genome(s) e.g. \n```\nmm10,/path/to/mm10.fa\necoli,/path/to/ecoli.fa\n```"
+                },
+                "bbsplit_index": {
+                    "type": "string",
+                    "format": "path",
+                    "exists": true,
+                    "fa_icon": "fas fa-bezier-curve",
+                    "description": "Path to directory or tar.gz archive for pre-built BBSplit index.",
+                    "help_text": "The BBSplit index will have to be built at least once with this pipeline (see `--save_reference` to save index). It can then be provided via `--bbsplit_index` for future runs."
+                },
+                "save_bbsplit_reads": {
+                    "type": "boolean",
+                    "fa_icon": "fas fa-save",
+                    "description": "If this option is specified, FastQ files split by reference will be saved in the results directory."
                 }
             }
         },
@@ -194,7 +225,11 @@
                     "type": "string",
                     "default": "bwa-mem",
                     "fa_icon": "fas fa-puzzle-piece",
-                    "enum": ["bwa-mem", "bwa-mem2", "dragmap"],
+                    "enum": [
+                        "bwa-mem",
+                        "bwa-mem2",
+                        "dragmap"
+                    ],
                     "description": "Specify aligner to be used to map reads to reference genome.",
                     "help_text": "`Sarek` will build missing indices automatically if not provided. Set `--bwa false` if indices should be (re-)built.\nIf `DragMap` is selected as aligner, it is recommended to skip baserecalibration with `--skip_tools baserecalibrator`. See [here](https://gatk.broadinstitute.org/hc/en-us/articles/4407897446939--How-to-Run-germline-single-sample-short-variant-discovery-in-DRAGEN-mode) for more info.\n",
                     "hidden": true
@@ -246,7 +281,7 @@
                 },
                 "ascat_min_base_qual": {
                     "type": "number",
-                    "default": 20,
+                    "default": 20.0,
                     "fa_icon": "fas fa-greater-than",
                     "description": "Overwrite Ascat min base quality required for a read to be counted.",
                     "hidden": true,
@@ -254,7 +289,7 @@
                 },
                 "ascat_min_counts": {
                     "type": "number",
-                    "default": 10,
+                    "default": 10.0,
                     "fa_icon": "fas fa-align-center",
                     "description": "Overwrite Ascat minimum depth required in the normal for a SNP to be considered.",
                     "hidden": true,
@@ -262,7 +297,7 @@
                 },
                 "ascat_min_map_qual": {
                     "type": "number",
-                    "default": 35,
+                    "default": 35.0,
                     "fa_icon": "fas fa-balance-scale-left",
                     "description": "Overwrite Ascat min mapping quality required for a read to be counted.",
                     "hidden": true,
@@ -306,7 +341,7 @@
                 },
                 "cf_contamination": {
                     "type": "number",
-                    "default": 0,
+                    "default": 0.0,
                     "fa_icon": "fas fa-broom",
                     "description": "Design known contamination value for Control-FREEC",
                     "hidden": true,
@@ -314,7 +349,7 @@
                 },
                 "cf_minqual": {
                     "type": "number",
-                    "default": 0,
+                    "default": 0.0,
                     "fa_icon": "fas fa-greater-than",
                     "hidden": true,
                     "description": "Minimal sequencing quality for a position to be considered in BAF analysis.",
@@ -322,7 +357,7 @@
                 },
                 "cf_mincov": {
                     "type": "number",
-                    "default": 0,
+                    "default": 0.0,
                     "fa_icon": "fas fa-align-center",
                     "hidden": true,
                     "description": "Minimal read coverage for a position to be considered in BAF analysis.",
@@ -345,7 +380,7 @@
                 },
                 "cnvkit_reference": {
                     "type": "string",
-                    "default": null,
+                    "default": "None",
                     "fa_icon": "fas fa-file",
                     "help_text": "https://cnvkit.readthedocs.io/en/stable/pipeline.html?highlight=reference.cnn#batch",
                     "description": "Copy-number reference for CNVkit",
@@ -505,7 +540,11 @@
                     "type": "string",
                     "default": "vcf",
                     "description": "VEP output-file format.",
-                    "enum": ["json", "tab", "vcf"],
+                    "enum": [
+                        "json",
+                        "tab",
+                        "vcf"
+                    ],
                     "help_text": "Sets the format of the output-file from VEP. Available formats: json, tab and vcf.",
                     "fa_icon": "fas fa-table",
                     "hidden": true
@@ -528,10 +567,14 @@
                 "ascat_genome": {
                     "type": "string",
                     "fa_icon": "fa-solid fa-text",
-                    "default": null,
+                    "default": "None",
                     "description": "ASCAT genome.",
                     "help_text": "If you use AWS iGenomes, this has already been set for you appropriately.\n\nMust be set to run ASCAT, either hg19 or hg38. If you use AWS iGenomes, this has already been set for you appropriately.",
-                    "enum": ["None", "hg19", "hg38"],
+                    "enum": [
+                        "None",
+                        "hg19",
+                        "hg38"
+                    ],
                     "hidden": true
                 },
                 "ascat_alleles": {
@@ -899,7 +942,14 @@
                     "description": "Method used to save pipeline results to output directory.",
                     "help_text": "The Nextflow `publishDir` option specifies which intermediate files should be saved to the output directory. This option tells the pipeline what method should be used to move these files. See [Nextflow docs](https://www.nextflow.io/docs/latest/process.html#publishdir) for details.",
                     "fa_icon": "fas fa-copy",
-                    "enum": ["symlink", "rellink", "link", "copy", "copyNoFollow", "move"],
+                    "enum": [
+                        "symlink",
+                        "rellink",
+                        "link",
+                        "copy",
+                        "copyNoFollow",
+                        "move"
+                    ],
                     "hidden": true
                 },
                 "email": {

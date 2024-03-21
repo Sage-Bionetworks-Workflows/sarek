@@ -61,6 +61,7 @@ params.vep_cache_version     = WorkflowMain.getGenomeAttribute(params, 'vep_cach
 params.vep_genome            = WorkflowMain.getGenomeAttribute(params, 'vep_genome')
 params.vep_species           = WorkflowMain.getGenomeAttribute(params, 'vep_species')
 params.vep_version           = WorkflowMain.getGenomeAttribute(params, 'vep_version')
+params.bbsplit_index         = WorkflowMain.getGenomeAttribute(params, 'bbsplit')
 
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
