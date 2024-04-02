@@ -48,6 +48,16 @@ def checkPathParamList = [
     params.vep_cache
 ]
 
+// Check if file with list of fastas is provided when running BBSplit
+if (!params.skip_bbsplit && !params.bbsplit_index && params.bbsplit_fasta_list) {
+    ch_bbsplit_fasta_list = file(params.bbsplit_fasta_list)
+    if (ch_bbsplit_fasta_list.isEmpty()) {exit 1, "File provided with --bbsplit_fasta_list is empty: ${ch_bbsplit_fasta_list.getName()}!"}
+}
+
+// Check alignment parameters
+def prepareToolIndices  = []
+if (!params.skip_bbsplit) { prepareToolIndices << 'bbsplit' }
+
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     Check mandatory parameters
@@ -216,6 +226,9 @@ include { FASTP                                          } from '../modules/nf-c
 // Create umi consensus bams from fastq
 include { FASTQ_CREATE_UMI_CONSENSUS_FGBIO               } from '../subworkflows/local/fastq_create_umi_consensus_fgbio/main'
 
+// Bins reads by mapping to multiple references simultaneously, using BBMap (optional)
+include { BBMAP_BBSPLIT                                  } from '../modules/nf-core/bbmap/bbsplit/main'
+
 // Map input reads to reference genome
 include { FASTQ_ALIGN_BWAMEM_MEM2_DRAGMAP                } from '../subworkflows/local/fastq_align_bwamem_mem2_dragmap/main'
 
@@ -324,7 +337,10 @@ workflow SAREK {
         germline_resource,
         known_indels,
         known_snps,
-        pon)
+        pon,
+        params.bbsplit_fasta_list,
+        params.bbsplit_index,
+        prepareToolIndices)
 
     // Gather built indices or get them from the params
     // Built from the fasta file:
@@ -508,6 +524,19 @@ workflow SAREK {
             reads_for_alignment = reads_for_fastp
         }
 
+        // Remove genome contaminant reads using BBMAP_BBSPLIT
+        if (!params.skip_bbsplit) {
+            BBMAP_BBSPLIT (
+                reads_for_alignment,
+                PREPARE_GENOME.out.bbsplit_index,
+                [],
+                [ [], [] ],
+                false
+            )
+            .primary_fastq
+            .set { reads_for_alignment }
+            versions = versions.mix(BBMAP_BBSPLIT.out.versions.first())
+        }
         // STEP 1: MAPPING READS TO REFERENCE GENOME
         // reads will be sorted
         reads_for_alignment = reads_for_alignment.map{ meta, reads ->

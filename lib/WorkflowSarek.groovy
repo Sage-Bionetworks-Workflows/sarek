@@ -16,8 +16,11 @@ class WorkflowSarek {
         if (!params.fasta && params.step == 'annotate') {
             Nextflow.error "Genome fasta file not specified with e.g. '--fasta genome.fa' or via a detectable config file."
         }
+    
+        if (!params.skip_bbsplit && !params.bbsplit_index && !params.bbsplit_fasta_list) {
+            Nextflow.error("Please provide either --bbsplit_fasta_list / --bbsplit_index to run BBSplit.")
+        }
     }
-
     //
     // Get workflow summary for MultiQC
     //
